@@ -1,10 +1,168 @@
-<!doctype html><html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#173d32"><title>Správa hry – Najdi Daniela</title><link rel="stylesheet" href="style.css"><style>body{background:#f4f2ec}.admin-wrap{max-width:850px;margin:35px auto;padding:0 20px}.admin-card{background:#fff;border:1px solid #e5e0d6;border-radius:18px;padding:26px;margin:16px 0}.field{display:grid;gap:7px;margin:15px 0}.field label{font-size:11px;font-weight:800}.field input,.field textarea{width:100%;border:1px solid #dcd8cf;border-radius:9px;padding:12px;font:14px Raleway,Arial,sans-serif}.field textarea{min-height:75px}.hint{font-size:12px;line-height:1.6;color:#69776e}.post-row{border:1px solid #e5e0d6;padding:14px;border-radius:12px;margin:12px 0}.post-row textarea{width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:8px}.small-btn{border:0;background:#eee8dc;border-radius:20px;padding:9px 14px;font-weight:700;cursor:pointer}.status{padding:10px 0;font-size:13px}</style></head><body><header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">☕</span><span>NAJDI <b>DANIELA</b></span></a><span class="edition">ADMINISTRACE</span></header><main class="admin-wrap"><section class="admin-card"><p class="eyebrow">TVÉ OVLÁDACÍ CENTRUM</p><h1>Zprávy od Daniela</h1><p class="hint">Přihlas se, přidej fotografii a komentář. Zprávy se ukládají na Google Disk a hráčům se obnovují automaticky.</p><div class="field"><label>HESLO ADMINISTRÁTORA</label><input id="password" type="password" autocomplete="current-password"></div><button class="small-btn" id="login">Přihlásit se</button><p id="status" class="status" aria-live="polite"></p></section><section id="editor" class="admin-card" hidden><h2>Nová zpráva</h2><div class="field"><label>FOTOGRAFIE Z MOBILU</label><input id="photo" type="file" accept="image/*" capture="environment"></div><div class="field"><label>KOMENTÁŘ</label><textarea id="message" placeholder="Tak už jsem tady a čekám na prvního z vás. ☕"></textarea></div><button class="small-btn" id="publish">Zveřejnit zprávu</button></section><section id="saved" class="admin-card" hidden><h2>Zveřejněné zprávy</h2><div id="posts"></div></section></main>
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173d32"><title>Správa hry – Najdi Daniela</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body{background:#f4f2ec}.admin-wrap{max-width:850px;margin:35px auto;padding:0 20px}.admin-card{background:#fff;border:1px solid #e5e0d6;border-radius:18px;padding:26px;margin:16px 0}.admin-card h1{margin-top:0}.field{display:grid;gap:7px;margin:15px 0}.field label{font-size:11px;font-weight:800;letter-spacing:.5px}.field input,.field textarea{width:100%;border:1px solid #dcd8cf;border-radius:9px;padding:12px;font:14px Raleway,Arial,sans-serif;color:#20332d}.field textarea{min-height:75px;resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.admin-actions{display:flex;gap:10px;flex-wrap:wrap}.admin-actions button{flex:1;min-width:170px}.hint{font-size:12px;line-height:1.6;color:#69776e}.warning{padding:13px;border-radius:10px;background:#fff4df;color:#765622;font-size:12px;line-height:1.6}.clue-row{border:1px solid #e5e0d6;padding:12px;border-radius:10px;margin:10px 0}.clue-row input{width:100%;padding:9px;margin:5px 0;border:1px solid #ddd;border-radius:7px}.small-btn{border:0;background:#eee8dc;border-radius:20px;padding:8px 12px;font-weight:700;cursor:pointer}.post-row{border:1px solid #e5e0d6;padding:14px;border-radius:12px;margin:12px 0}.post-row input,.post-row textarea{width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:8px;font:14px Raleway,Arial,sans-serif}.post-row textarea{min-height:70px}.post-preview{max-width:180px;max-height:120px;object-fit:cover;border-radius:8px;display:block;margin:8px 0}
+  </style>
+</head>
+<body>
+<header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">☕</span><span>NAJDI <b>DANIELA</b></span></a><span class="edition">ADMINISTRACE</span></header>
+<main class="admin-wrap">
+  <div class="admin-card">
+    <p class="eyebrow">TVÉ OVLÁDACÍ CENTRUM</p><h1>Správa herní mise</h1>
+    <p class="hint">Tady připravíš veřejné informace, které uvidí hráči. Po dokončení stáhni soubor missions.json a nahraj ho do kořenové složky GitHub repozitáře místo původního souboru.</p>
+    <div class="warning"><b>Důležité:</b> Tato první verze nemá serverovou administraci. Úpravy se ukládají v tomto prohlížeči a zveřejníš je nahráním souboru na GitHub. Do veřejných údajů nevkládej přesnou adresu, soukromé kontakty ani neveřejné ověřovací kódy. Odměnu potvrď osobně.</div>
+  </div>
+  <div class="admin-card">
+    <h2>Základní nastavení</h2>
+    <label class="check-row"><input type="checkbox" id="active" checked><span>Mise je aktivní a viditelná hráčům</span></label>
+    <div class="field"><label>NÁZEV MISE</label><input id="title" value="Najdi dnešní kavárnu"></div>
+    <div class="field"><label>MĚSTO / OBLAST</label><input id="city" value="Šumperk a okolí"></div>
+    <div class="field"><label>VEŘEJNÁ PRVNÍ INDICIE</label><textarea id="publicClue">Najdeš mě tam, kde se potkává příjemná atmosféra s vůní čerstvé kávy.</textarea></div>
+    <div class="two">
+      <div class="field"><label>STŘED OBLASTI – ZEMĚPISNÁ ŠÍŘKA</label><input id="lat" type="number" step="0.0001" value="49.9653"></div>
+      <div class="field"><label>STŘED OBLASTI – ZEMĚPISNÁ DÉLKA</label><input id="lng" type="number" step="0.0001" value="16.9706"></div>
+    </div>
+    <div class="field"><label>POLOMĚR OBLASTI V KM</label><input id="radius" type="number" min="0.5" max="20" step="0.5" value="2.5"></div>
+  </div>
+  <div class="admin-card">
+    <h2>Další indicie</h2><p class="hint">Nápovědy se hráčům zobrazují postupně. První je viditelná hned, další odemkne hráč tlačítkem po splnění úkolu.</p>
+    <div id="clues"></div><button class="small-btn" id="add-clue" type="button">+ Přidat indicii</button>
+  </div>
+  <div class="admin-card">
+    <h2>Úkol pro hráče</h2>
+    <div class="field"><label>ZADÁNÍ ÚKOLU</label><textarea id="task">Najdi na cestě něco, co ti připomene Vánoce.</textarea></div>
+    <div class="field"><label>INFORMACE O ODMĚNĚ</label><textarea id="reward">Odměna 400 Kč je určena pouze účastníkům, kteří splní předem stanovené podmínky příslušné nabídky. Ostatní návštěvníci dostanou drobný reklamní dárek.</textarea></div>
+  </div>
+  <div class="admin-card">
+    <h2>Zprávy od Daniela</h2>
+    <p class="hint">Zprávy a fotografie se ukládají přímo na Google Disk. Hráčům se zobrazí automaticky. Nejnovější zpráva je nahoře.</p>
+    <div class="field"><label>HESLO ADMINISTRÁTORA</label><input id="admin-password" type="password" autocomplete="current-password" placeholder="Heslo uložené v Apps Scriptu"></div>
+    <div class="field"><label>FOTOGRAFIE (VOLITELNĚ, MAX. 4 MB)</label><input id="admin-photo" type="file" accept="image/*" capture="environment"></div>
+    <div class="field"><label>KOMENTÁŘ</label><textarea id="admin-message" placeholder="Tak už jsem na místě a čekám na prvního z vás…"></textarea></div>
+    <button class="small-btn" id="publish-message" type="button">Zveřejnit zprávu</button>
+    <p id="message-status" class="hint" aria-live="polite"></p>
+    <h3>Již zveřejněné zprávy</h3><div id="live-posts"><p class="hint">Načítám zprávy…</p></div><div id="posts" hidden></div>
+    <button class="small-btn" id="reload-live" type="button">Obnovit seznam</button>
+  </div>
+  <div class="admin-card">
+    <h2>Publikování mise</h2>
+    <div class="admin-actions"><button class="button button-dark" id="download" type="button">Stáhnout missions.json</button><button class="button" style="background:#eee8dc;color:#20332d" id="preview" type="button">Náhled hry</button></div>
+    <p id="feedback" class="hint" aria-live="polite"></p>
+    <p class="hint"><b>Postup zveřejnění:</b> v GitHubu otevři soubor missions.json → tužka Edit → nahraď jeho obsah staženým JSON → Commit changes.</p>
+  </div>
+</main>
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbys7uP-yDkuPY0k_aGFawtPYuYU1uyb5UimvQs1JxU8Bgk-N7B-u472mU-VF4v2GEhRAQ/exec";const $=id=>document.getElementById(id);let password="";
-function getMessages(){return new Promise((resolve,reject)=>{const cb="__msg"+Math.random().toString(36).slice(2),s=document.createElement("script");const timer=setTimeout(()=>{clean();reject(Error("Vypršel čas načítání."));},12000);function clean(){clearTimeout(timer);delete window[cb];s.remove();}window[cb]=d=>{clean();resolve(d);};s.onerror=()=>{clean();reject(Error("Nepodařilo se načíst zprávy."));};s.src=API_URL+"?callback="+cb+"&t="+Date.now();document.head.appendChild(s);});}
-async function refresh(){const d=await getMessages();if(!d.success)throw Error(d.error||"Chyba načítání");render(d.messages||[]);}
-function render(items){$("posts").innerHTML="";if(!items.length){$("posts").textContent="Zatím nejsou zveřejněné žádné zprávy.";return;}items.forEach(m=>{const row=document.createElement("div");row.className="post-row";const title=document.createElement("b");title.textContent="Zpráva";row.appendChild(title);if(m.imageUrl){const img=document.createElement("img");img.src=m.imageUrl;img.alt="Fotografie zprávy";img.style="max-width:180px;max-height:120px;display:block;margin:8px 0";row.appendChild(img);}const ta=document.createElement("textarea");ta.value=m.message||m.text||"";row.appendChild(ta);const edit=document.createElement("button");edit.className="small-btn";edit.textContent="Uložit změnu";edit.onclick=()=>send({action:"update",id:m.id,message:ta.value});const del=document.createElement("button");del.className="small-btn";del.textContent="Smazat";del.onclick=()=>{if(confirm("Opravdu smazat zprávu?"))send({action:"delete",id:m.id});};row.append(edit,del);$("posts").appendChild(row);});}
-async function send(data){$("status").textContent="Odesílám…";try{await fetch(API_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({...data,password})});await new Promise(r=>setTimeout(r,1800));await refresh();$("status").textContent="Hotovo – seznam zpráv byl znovu načten.";}catch(e){$("status").textContent="Nepodařilo se ověřit změnu: "+e.message;}}
-$("login").onclick=async()=>{password=$("password").value;if(!password){$("status").textContent="Zadej heslo.";return;}try{await refresh();$("editor").hidden=false;$("saved").hidden=false;$("status").textContent="Připojeno k seznamu zpráv.";}catch(e){$("status").textContent="Chyba spojení: "+e.message;}};
-$("publish").onclick=async()=>{const file=$("photo").files[0],message=$("message").value.trim();if(!file&&!message){$("status").textContent="Přidej fotografii nebo text.";return;}const data={action:"publish",message};if(file){if(file.size>4*1024*1024){$("status").textContent="Vyber fotografii do 4 MB.";return;}const dataUrl=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});data.imageBase64=String(dataUrl).split(",")[1];data.mimeType=file.type||"image/jpeg";}await send(data);$("message").value="";$("photo").value="";};
-</script></body></html>
+const $ = id => document.getElementById(id);
+let clueData = [
+ {title:"První stopa",text:"Hledej místo, kam se chodí zpomalit a na chvíli vypnout."},
+ {title:"Druhá stopa",text:"Rozhlédni se po centru. Možná tě napoví výloha nebo vánoční výzdoba."}
+];
+let postData = [];
+let missionLoaded = false;
+function renderClues(){
+ $("clues").innerHTML="";
+ clueData.forEach((c,i)=>{
+  const row=document.createElement("div");row.className="clue-row";
+  row.innerHTML=`<b>Indicie ${i+1}</b><input aria-label="Název indicie" value="${escapeHtml(c.title)}" data-title="${i}"><input aria-label="Text indicie" value="${escapeHtml(c.text)}" data-text="${i}"><button class="small-btn" data-remove="${i}" type="button">Odebrat</button>`;
+  $("clues").appendChild(row);
+ });
+ $("clues").querySelectorAll("[data-title]").forEach(el=>el.addEventListener("input",e=>clueData[+e.target.dataset.title].title=e.target.value));
+ $("clues").querySelectorAll("[data-text]").forEach(el=>el.addEventListener("input",e=>clueData[+e.target.dataset.text].text=e.target.value));
+ $("clues").querySelectorAll("[data-remove]").forEach(el=>el.addEventListener("click",e=>{clueData.splice(+e.target.dataset.remove,1);renderClues()}));
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+$("add-clue").addEventListener("click",()=>{clueData.push({title:"Nová stopa",text:"Doplň text indicie."});renderClues()});
+function renderPosts(){
+ const wrap=$("posts");wrap.innerHTML="";
+ postData.forEach((post,i)=>{
+  const row=document.createElement("div");row.className="post-row";
+  row.innerHTML=`<b>Zpráva ${i+1} – ${i===0?"nejnovější":"starší"}</b><input type="url" placeholder="Odkaz na fotografii z ImageKitu (volitelné)" aria-label="Odkaz na fotografii" value="${escapeHtml(post.imageUrl||"")}" data-image="${i}"><textarea placeholder="Komentář ke zprávě…" aria-label="Komentář ke zprávě" data-message="${i}">${escapeHtml(post.message||"")}</textarea><button class="small-btn" type="button" data-remove-post="${i}">Odebrat zprávu</button>`;
+  wrap.appendChild(row);
+ });
+ wrap.querySelectorAll("[data-image]").forEach(el=>el.addEventListener("input",e=>postData[+e.target.dataset.image].imageUrl=e.target.value.trim()));
+ wrap.querySelectorAll("[data-message]").forEach(el=>el.addEventListener("input",e=>postData[+e.target.dataset.message].message=e.target.value));
+ wrap.querySelectorAll("[data-remove-post]").forEach(el=>el.addEventListener("click",e=>{postData.splice(+e.target.dataset.removePost,1);renderPosts()}));
+}
+$("add-post").addEventListener("click",()=>{postData.unshift({imageUrl:"",message:""});renderPosts()});
+function loadMission(data){
+ if(!data || typeof data!=="object") return;
+ $("active").checked=data.active!==false; $("title").value=data.title||""; $("city").value=data.city||"";
+ $("lat").value=data.centerLat??""; $("lng").value=data.centerLng??""; $("radius").value=data.radiusKm??2.5;
+ $("publicClue").value=data.publicClue||""; $("task").value=data.task||""; $("reward").value=data.rewardText||"";
+ if(Array.isArray(data.clues)) clueData=data.clues.map(c=>({title:c.title||"",text:c.text||""}));
+ if(Array.isArray(data.announcements)) postData=data.announcements.map(p=>({imageUrl:p.imageUrl||"",message:p.message||""}));
+ renderClues(); renderPosts(); missionLoaded=true;
+}
+async function loadSavedMission(){
+ try { const response=await fetch("missions.json?adminLoad="+Date.now(),{cache:"no-store"}); if(response.ok) loadMission(await response.json()); }
+ catch(error){ $("feedback").textContent="Nepodařilo se načíst uloženou misi. Můžeš pokračovat s výchozími údaji."; }
+}
+function makeData(){return {
+ active:$("active").checked,title:$("title").value.trim(),city:$("city").value.trim(),
+ centerLat:Number($("lat").value),centerLng:Number($("lng").value),radiusKm:Number($("radius").value),
+ publicClue:$("publicClue").value.trim(),clues:clueData,task:$("task").value.trim(),rewardText:$("reward").value.trim(),announcements:postData
+};}
+$("download").addEventListener("click",()=>{
+ const data=makeData();const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="missions.json";a.click();URL.revokeObjectURL(url);
+ $("feedback").textContent="Soubor missions.json byl připraven ke stažení. Teď ho nahraj do GitHubu a potvrď změnu.";
+});
+$("preview").addEventListener("click",()=>window.open("index.html","_blank"));
+renderClues();
+renderPosts();
+loadSavedMission();
+</script>
+
+<script>
+const MESSAGE_API="https://script.google.com/macros/s/AKfycbys7uP-yDkuPY0k_aGFawtPYuYU1uyb5UimvQs1JxU8Bgk-N7B-u472mU-VF4v2GEhRAQ/exec";
+const byId=id=>document.getElementById(id);
+function fetchLiveMessages(){return new Promise((resolve,reject)=>{
+ const cb="__najdiAdmin"+Math.random().toString(36).slice(2),s=document.createElement("script");let finished=false;
+ const cleanup=()=>{if(finished)return;finished=true;clearTimeout(timer);try{delete window[cb]}catch(_){window[cb]=undefined} s.remove()};
+ const timer=setTimeout(()=>{cleanup();reject(new Error("Načítání zpráv vypršelo."))},12000);
+ window[cb]=data=>{cleanup();resolve(data)};s.onerror=()=>{cleanup();reject(new Error("Zprávy se nepodařilo načíst."))};
+ s.src=MESSAGE_API+"?callback="+cb+"&t="+Date.now();document.head.appendChild(s);
+});}
+async function refreshLiveMessages(){
+ const wrap=byId("live-posts");wrap.textContent="Načítám…";
+ try{const data=await fetchLiveMessages();if(!data.success)throw new Error(data.error||"Chyba načítání");
+  wrap.innerHTML="";const items=data.messages||[];
+  if(!items.length){wrap.textContent="Zatím nejsou zveřejněné žádné zprávy.";return;}
+  items.forEach(item=>{const row=document.createElement("div");row.className="post-row";
+   const stamp=document.createElement("p");stamp.className="hint";stamp.textContent=item.createdAt?new Date(item.createdAt).toLocaleString("cs-CZ"):"Zpráva";row.appendChild(stamp);
+   if(item.imageUrl){const img=document.createElement("img");img.src=item.imageUrl;img.alt="Fotografie zprávy";img.className="post-preview";row.appendChild(img)}
+   const area=document.createElement("textarea");area.value=item.message||item.text||"";area.setAttribute("aria-label","Text zprávy");row.appendChild(area);
+   const save=document.createElement("button");save.className="small-btn";save.type="button";save.textContent="Uložit text";save.addEventListener("click",()=>sendLive({action:"update",id:item.id,message:area.value}));
+   const del=document.createElement("button");del.className="small-btn";del.type="button";del.textContent="Smazat";del.addEventListener("click",()=>{if(confirm("Opravdu smazat tuto zprávu?"))sendLive({action:"delete",id:item.id})});
+   row.append(save,del);wrap.appendChild(row);
+  });
+ }catch(err){wrap.textContent=err.message;}
+}
+async function sendLive(data){
+ const password=byId("admin-password").value;
+ if(!password){byId("message-status").textContent="Zadej heslo administrátora.";return false;}
+ byId("message-status").textContent="Odesílám požadavek…";
+ try{
+  await fetch(MESSAGE_API,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({...data,password})});
+  await new Promise(resolve=>setTimeout(resolve,1800));await refreshLiveMessages();
+  byId("message-status").textContent="Požadavek byl odeslán. Ověř, že se změna zobrazuje v seznamu.";return true;
+ }catch(err){byId("message-status").textContent="Nepodařilo se ověřit změnu: "+err.message;return false;}
+}
+byId("publish-message").addEventListener("click",async()=>{
+ const file=byId("admin-photo").files[0],message=byId("admin-message").value.trim();
+ if(!file&&!message){byId("message-status").textContent="Přidej fotografii nebo text.";return;}
+ const data={action:"publish",message};
+ if(file){if(file.size>4*1024*1024){byId("message-status").textContent="Fotografie musí mít nejvýše 4 MB.";return;}
+  try{const url=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)});data.imageBase64=String(url).split(",")[1];data.mimeType=file.type||"image/jpeg";}catch(_){byId("message-status").textContent="Fotografii se nepodařilo načíst.";return;}
+ }
+ const ok=await sendLive(data);if(ok){byId("admin-message").value="";byId("admin-photo").value="";}
+});
+byId("reload-live").addEventListener("click",refreshLiveMessages);
+refreshLiveMessages();
+</script>
+
+</body></html>
