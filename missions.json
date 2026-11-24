@@ -1,3 +1,4 @@
+
 {
   "active": true,
   "title": "Ukázková mise – Najdi dnešní kavárnu",
@@ -17,5 +18,6 @@
     }
   ],
   "task": "Najdi na cestě něco, co ti připomene Vánoce.",
-  "rewardText": "Odměna 400 Kč je určena pouze účastníkům, kteří splní předem stanovené podmínky příslušné nabídky. Ostatní návštěvníci dostanou drobný reklamní dárek."
+  "rewardText": "Odměna 400 Kč je určena pouze účastníkům, kteří splní předem stanovené podmínky příslušné nabídky. Ostatní návštěvníci dostanou drobný reklamní dárek.",
+  "announcements": []
 }
