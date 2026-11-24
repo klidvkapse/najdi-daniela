@@ -1,3 +1,4 @@
+[README.md](https://github.com/user-attachments/files/35343647/README.md)
 # Najdi Daniela – první verze
 
 Jednoduchá mobilní webová hra pro GitHub Pages.
