@@ -20,6 +20,10 @@
   "rewardText": "Odměna 400 Kč je určena pouze účastníkům, kteří splní předem stanovené podmínky příslušné nabídky. Ostatní návštěvníci dostanou drobný reklamní dárek.",
   "announcements": [
     {
+      "imageUrl": "https://ik.imagekit.io/0elwm8vsx/%C4%8Db.png",
+      "message": "KDO DŘÍV PŘIJDE TEN DŘÍV MELE"
+    },
+    {
       "imageUrl": "",
       "message": "TAK JEM NA MÍSTĚ A ČEKÁM"
     }
