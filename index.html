@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173d32">
+  <meta name="description" content="Najdi Daniela – předvánoční hra s mapou, indiciemi a malými překvapeními.">
+  <title>Najdi Daniela – Káva, která se může vyplatit</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./"><span class="brand-mark">☕</span><span>NAJDI <b>DANIELA</b></span></a>
+    <span class="edition">PŘEDVÁNOČNÍ HRA</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">KÁVA • INDICIE • MALÉ PŘEKVAPENÍ</p>
+        <h1>Dokážeš mě<br><em>najít?</em></h1>
+        <p class="hero-lead">Vydej se po stopách, lušti indicie a pojď si se mnou dát kávu.</p>
+        <a class="button button-gold" href="#mise">JDU HRÁT <span>→</span></a>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="glow"></div>
+        <div class="cup">☕</div>
+        <div class="spark spark-one">✦</div><div class="spark spark-two">✧</div>
+        <div class="hero-note">Káva, která<br>se může vyplatit.</div>
+      </div>
+    </section>
+
+    <section class="intro-grid">
+      <article class="intro-card"><span class="icon">🧭</span><h3>Najdi stopu</h3><p>Podívej se na mapu a začni luštit první indicii.</p></article>
+      <article class="intro-card"><span class="icon">🧩</span><h3>Splň úkoly</h3><p>Postupně odemykej další nápovědy a přibliž se cíli.</p></article>
+      <article class="intro-card"><span class="icon">🎁</span><h3>Potkej Daniela</h3><p>Zastav se na kávu. Čeká tě setkání a malé překvapení.</p></article>
+    </section>
+
+    <section class="game-section" id="mise">
+      <div class="section-heading">
+        <p class="eyebrow">AKTUÁLNÍ VÝZVA</p>
+        <h2>Dnešní mise</h2>
+        <p id="mission-status" class="muted">Načítám aktuální misi…</p>
+      </div>
+
+      <div id="no-mission" class="notice hidden">
+        <div class="notice-icon">🕯️</div>
+        <h3>Další stopa se připravuje</h3>
+        <p>Právě teď není aktivní žádná mise. Sleduj moje příspěvky – brzy se objeví nová výzva.</p>
+      </div>
+
+      <div id="mission-content" class="mission-layout hidden">
+        <div class="map-panel">
+          <div class="panel-head"><div><span class="eyebrow">OBLAST HLEDÁNÍ</span><h3 id="mission-city">Šumperk a okolí</h3></div><span class="map-pin">⌖</span></div>
+          <div id="map"></div>
+          <p class="map-caption">Mapa ukazuje pouze přibližnou oblast. Přesné místo zatím zůstává tajemstvím.</p>
+        </div>
+        <div class="clue-panel">
+          <div class="clue-top"><span class="eyebrow">PRVNÍ INDICIE</span><span class="pill" id="clue-count">1. stopa</span></div>
+          <h3 id="clue-title">Kde dnes sedím?</h3>
+          <p id="clue-text" class="clue-text"></p>
+          <div id="clue-list" class="clue-list"></div>
+          <div id="task-area" class="task-area hidden">
+            <h4>Malý úkol</h4>
+            <p id="task-text"></p>
+            <label class="check-row"><input type="checkbox" id="task-check"><span>Úkol mám splněný</span></label>
+          </div>
+          <button id="next-clue" class="button button-dark" type="button">Zobrazit další indicii</button>
+          <p class="small muted" id="clue-help">Další indicie se zpřístupní po splnění úkolu nebo v určený čas.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-section">
+      <div><p class="eyebrow">JAK TO FUNGUJE</p><h2>Jednoduše.<br><em>Bez registrace.</em></h2></div>
+      <ol class="steps">
+        <li><b>Otevři hru.</b><span>Nemusíš nic instalovat ani se registrovat.</span></li>
+        <li><b>Sleduj indicie.</b><span>Mapa a úkoly tě navedou správným směrem.</span></li>
+        <li><b>Najdi mě.</b><span>Potkáme se, dáme si kávu a popovídáme si.</span></li>
+      </ol>
+    </section>
+
+    <section class="reward">
+      <div class="gift">🎁</div>
+      <div><p class="eyebrow">MALÉ PŘEKVAPENÍ</p><h2>Možná si odneseš<br><em>400 Kč navíc.</em></h2><p id="reward-text">Odměna 400 Kč je určena pouze účastníkům, kteří splní předem stanovené podmínky příslušné nabídky. Ostatní návštěvníci dostanou drobný reklamní dárek.</p></div>
+    </section>
+  </main>
+
+  <footer><span>☕ KÁVA S DANIELEM</span><span>Malé setkání. Příjemné překvapení.</span></footer>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

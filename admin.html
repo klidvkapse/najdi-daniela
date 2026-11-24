@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173d32"><title>Správa hry – Najdi Daniela</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body{background:#f4f2ec}.admin-wrap{max-width:850px;margin:35px auto;padding:0 20px}.admin-card{background:#fff;border:1px solid #e5e0d6;border-radius:18px;padding:26px;margin:16px 0}.admin-card h1{margin-top:0}.field{display:grid;gap:7px;margin:15px 0}.field label{font-size:11px;font-weight:800;letter-spacing:.5px}.field input,.field textarea{width:100%;border:1px solid #dcd8cf;border-radius:9px;padding:12px;font:14px Raleway,Arial,sans-serif;color:#20332d}.field textarea{min-height:75px;resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.admin-actions{display:flex;gap:10px;flex-wrap:wrap}.admin-actions button{flex:1;min-width:170px}.hint{font-size:12px;line-height:1.6;color:#69776e}.warning{padding:13px;border-radius:10px;background:#fff4df;color:#765622;font-size:12px;line-height:1.6}.clue-row{border:1px solid #e5e0d6;padding:12px;border-radius:10px;margin:10px 0}.clue-row input{width:100%;padding:9px;margin:5px 0;border:1px solid #ddd;border-radius:7px}.small-btn{border:0;background:#eee8dc;border-radius:20px;padding:8px 12px;font-weight:700;cursor:pointer}
+  </style>
+</head>
+<body>
+<header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">☕</span><span>NAJDI <b>DANIELA</b></span></a><span class="edition">ADMINISTRACE</span></header>
+<main class="admin-wrap">
+  <div class="admin-card">
+    <p class="eyebrow">TVÉ OVLÁDACÍ CENTRUM</p><h1>Správa herní mise</h1>
+    <p class="hint">Tady připravíš veřejné informace, které uvidí hráči. Po dokončení stáhni soubor missions.json a nahraj ho do kořenové složky GitHub repozitáře místo původního souboru.</p>
+    <div class="warning"><b>Důležité:</b> Tato první verze nemá serverovou administraci. Úpravy se ukládají v tomto prohlížeči a zveřejníš je nahráním souboru na GitHub. Do veřejných údajů nevkládej přesnou adresu, soukromé kontakty ani neveřejné ověřovací kódy. Odměnu potvrď osobně.</div>
+  </div>
+  <div class="admin-card">
+    <h2>Základní nastavení</h2>
+    <label class="check-row"><input type="checkbox" id="active" checked><span>Mise je aktivní a viditelná hráčům</span></label>
+    <div class="field"><label>NÁZEV MISE</label><input id="title" value="Najdi dnešní kavárnu"></div>
+    <div class="field"><label>MĚSTO / OBLAST</label><input id="city" value="Šumperk a okolí"></div>
+    <div class="field"><label>VEŘEJNÁ PRVNÍ INDICIE</label><textarea id="publicClue">Najdeš mě tam, kde se potkává příjemná atmosféra s vůní čerstvé kávy.</textarea></div>
+    <div class="two">
+      <div class="field"><label>STŘED OBLASTI – ZEMĚPISNÁ ŠÍŘKA</label><input id="lat" type="number" step="0.0001" value="49.9653"></div>
+      <div class="field"><label>STŘED OBLASTI – ZEMĚPISNÁ DÉLKA</label><input id="lng" type="number" step="0.0001" value="16.9706"></div>
+    </div>
+    <div class="field"><label>POLOMĚR OBLASTI V KM</label><input id="radius" type="number" min="0.5" max="20" step="0.5" value="2.5"></div>
+  </div>
+  <div class="admin-card">
+    <h2>Další indicie</h2><p class="hint">Nápovědy se hráčům zobrazují postupně. První je viditelná hned, další odemkne hráč tlačítkem po splnění úkolu.</p>
+    <div id="clues"></div><button class="small-btn" id="add-clue" type="button">+ Přidat indicii</button>
+  </div>
+  <div class="admin-card">
+    <h2>Úkol pro hráče</h2>
+    <div class="field"><label>ZADÁNÍ ÚKOLU</label><textarea id="task">Najdi na cestě něco, co ti připomene Vánoce.</textarea></div>
+    <div class="field"><label>INFORMACE O ODMĚNĚ</label><textarea id="reward">Odměna 400 Kč je určena pouze účastníkům, kteří splní předem stanovené podmínky příslušné nabídky. Ostatní návštěvníci dostanou drobný reklamní dárek.</textarea></div>
+  </div>
+  <div class="admin-card">
+    <h2>Publikování mise</h2>
+    <div class="admin-actions"><button class="button button-dark" id="download" type="button">Stáhnout missions.json</button><button class="button" style="background:#eee8dc;color:#20332d" id="preview" type="button">Náhled hry</button></div>
+    <p id="feedback" class="hint" aria-live="polite"></p>
+    <p class="hint"><b>Postup zveřejnění:</b> v GitHubu otevři soubor missions.json → tužka Edit → nahraď jeho obsah staženým JSON → Commit changes.</p>
+  </div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+let clueData = [
+ {title:"První stopa",text:"Hledej místo, kam se chodí zpomalit a na chvíli vypnout."},
+ {title:"Druhá stopa",text:"Rozhlédni se po centru. Možná tě napoví výloha nebo vánoční výzdoba."}
+];
+function renderClues(){
+ $("clues").innerHTML="";
+ clueData.forEach((c,i)=>{
+  const row=document.createElement("div");row.className="clue-row";
+  row.innerHTML=`<b>Indicie ${i+1}</b><input aria-label="Název indicie" value="${escapeHtml(c.title)}" data-title="${i}"><input aria-label="Text indicie" value="${escapeHtml(c.text)}" data-text="${i}"><button class="small-btn" data-remove="${i}" type="button">Odebrat</button>`;
+  $("clues").appendChild(row);
+ });
+ $("clues").querySelectorAll("[data-title]").forEach(el=>el.addEventListener("input",e=>clueData[+e.target.dataset.title].title=e.target.value));
+ $("clues").querySelectorAll("[data-text]").forEach(el=>el.addEventListener("input",e=>clueData[+e.target.dataset.text].text=e.target.value));
+ $("clues").querySelectorAll("[data-remove]").forEach(el=>el.addEventListener("click",e=>{clueData.splice(+e.target.dataset.remove,1);renderClues()}));
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+$("add-clue").addEventListener("click",()=>{clueData.push({title:"Nová stopa",text:"Doplň text indicie."});renderClues()});
+function makeData(){return {
+ active:$("active").checked,title:$("title").value.trim(),city:$("city").value.trim(),
+ centerLat:Number($("lat").value),centerLng:Number($("lng").value),radiusKm:Number($("radius").value),
+ publicClue:$("publicClue").value.trim(),clues:clueData,task:$("task").value.trim(),rewardText:$("reward").value.trim()
+};}
+$("download").addEventListener("click",()=>{
+ const data=makeData();const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="missions.json";a.click();URL.revokeObjectURL(url);
+ $("feedback").textContent="Soubor missions.json byl připraven ke stažení. Teď ho nahraj do GitHubu a potvrď změnu.";
+});
+$("preview").addEventListener("click",()=>window.open("index.html","_blank"));
+renderClues();
+</script>
+</body></html>

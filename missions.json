@@ -1,0 +1,21 @@
+{
+  "active": true,
+  "title": "Ukázková mise – Najdi dnešní kavárnu",
+  "city": "Šumperk a okolí",
+  "centerLat": 49.9653,
+  "centerLng": 16.9706,
+  "radiusKm": 2.5,
+  "publicClue": "Najdeš mě tam, kde se potkává příjemná atmosféra s vůní čerstvé kávy.",
+  "clues": [
+    {
+      "title": "První stopa",
+      "text": "Hledej místo, kam se chodí zpomalit a na chvíli vypnout."
+    },
+    {
+      "title": "Druhá stopa",
+      "text": "Rozhlédni se po centru. Možná tě napoví výloha nebo vánoční výzdoba."
+    }
+  ],
+  "task": "Najdi na cestě něco, co ti připomene Vánoce.",
+  "rewardText": "Odměna 400 Kč je určena pouze účastníkům, kteří splní předem stanovené podmínky příslušné nabídky. Ostatní návštěvníci dostanou drobný reklamní dárek."
+}

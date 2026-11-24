@@ -1,0 +1,17 @@
+{
+  "name": "Najdi Daniela",
+  "short_name": "Najdi Daniela",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fbfaf7",
+  "theme_color": "#173d32",
+  "description": "Předvánoční hra s mapou, indiciemi a úkoly.",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

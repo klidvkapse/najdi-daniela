@@ -1,0 +1,100 @@
+const DEFAULT_MISSION = {
+  active: true,
+  title: "Najdi dnešní kavárnu",
+  city: "Šumperk a okolí",
+  centerLat: 49.9653,
+  centerLng: 16.9706,
+  radiusKm: 2.5,
+  publicClue: "Najdeš mě tam, kde se potkává příjemná atmosféra s vůní čerstvé kávy.",
+  clues: [
+    { title: "První stopa", text: "Hledej místo, kam se chodí zpomalit a na chvíli vypnout." },
+    { title: "Druhá stopa", text: "Rozhlédni se po centru. Možná tě napoví výloha nebo vánoční výzdoba." }
+  ],
+  task: "Najdi na cestě něco, co ti připomene Vánoce.",
+  rewardText: "Odměna 400 Kč je určena pouze účastníkům, kteří splní předem stanovené podmínky příslušné nabídky. Ostatní návštěvníci dostanou drobný reklamní dárek."
+};
+
+let mission = null;
+let mapInstance = null;
+let currentClue = 0;
+
+async function loadMission() {
+  try {
+    const response = await fetch("missions.json", { cache: "no-store" });
+    if (!response.ok) throw new Error("Mise není dostupná");
+    mission = await response.json();
+  } catch (error) {
+    mission = DEFAULT_MISSION;
+    document.getElementById("mission-status").textContent = "Ukázková mise – zatím není zveřejněna tvoje vlastní.";
+  }
+  renderMission();
+}
+
+function renderMission() {
+  const status = document.getElementById("mission-status");
+  const empty = document.getElementById("no-mission");
+  const content = document.getElementById("mission-content");
+  if (!mission || !mission.active) {
+    empty.classList.remove("hidden");
+    content.classList.add("hidden");
+    status.textContent = "Momentálně není aktivní žádná mise.";
+    return;
+  }
+  empty.classList.add("hidden");
+  content.classList.remove("hidden");
+  document.getElementById("mission-city").textContent = mission.city || "Místo bude upřesněno";
+  document.getElementById("clue-title").textContent = mission.title || "Kde dnes sedím?";
+  document.getElementById("clue-text").textContent = mission.publicClue || "První indicie se právě připravuje.";
+  document.getElementById("reward-text").textContent = mission.rewardText || DEFAULT_MISSION.rewardText;
+  status.textContent = mission.subtitle || "Bez registrace. Jen pár indicií a příjemné setkání.";
+  renderClues();
+  renderMap();
+}
+
+function renderClues() {
+  const list = document.getElementById("clue-list");
+  list.innerHTML = "";
+  const clues = mission.clues || [];
+  clues.forEach((clue, index) => {
+    const item = document.createElement("div");
+    item.className = "clue-item" + (index > currentClue ? " locked" : "");
+    item.textContent = index > currentClue ? `🔒 ${index + 1}. indicie – zatím zamčeno` : `${index + 1}. ${clue.title}: ${clue.text}`;
+    list.appendChild(item);
+  });
+  document.getElementById("clue-count").textContent = `${Math.min(currentClue + 1, clues.length || 1)}. stopa`;
+  const task = document.getElementById("task-area");
+  if (mission.task) {
+    task.classList.remove("hidden");
+    document.getElementById("task-text").textContent = mission.task;
+  } else task.classList.add("hidden");
+  const next = document.getElementById("next-clue");
+  next.disabled = currentClue >= clues.length - 1 || (mission.task && !document.getElementById("task-check").checked);
+  next.textContent = currentClue >= clues.length - 1 ? "Všechny indicie odhaleny" : "Zobrazit další indicii";
+}
+
+function renderMap() {
+  if (!window.L || mapInstance) return;
+  const lat = Number(mission.centerLat) || 49.9653;
+  const lng = Number(mission.centerLng) || 16.9706;
+  const radius = Math.max(500, Number(mission.radiusKm || 2) * 1000);
+  mapInstance = L.map("map", { scrollWheelZoom: false }).setView([lat, lng], 13);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(mapInstance);
+  L.circle([lat, lng], { radius, color: "#b18b4a", fillColor: "#d8b56d", fillOpacity: .18, weight: 2 }).addTo(mapInstance);
+  L.marker([lat, lng]).addTo(mapInstance).bindPopup("Oblast dnešního hledání");
+  setTimeout(() => mapInstance.invalidateSize(), 250);
+}
+
+document.getElementById("next-clue").addEventListener("click", () => {
+  if (currentClue < (mission.clues || []).length - 1) {
+    currentClue++;
+    renderClues();
+  }
+});
+document.getElementById("task-check").addEventListener("change", renderClues);
+
+loadMission();
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+}
