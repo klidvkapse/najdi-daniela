@@ -60,7 +60,8 @@ function renderAnnouncements() {
   const list = document.getElementById("announcement-list");
   if (!list) return;
   list.innerHTML = "";
-  const posts = liveAnnouncementsLoaded ? liveAnnouncements : (Array.isArray(mission?.announcements) ? mission.announcements : []);
+  const legacyPosts = Array.isArray(mission?.announcements) ? mission.announcements : [];
+  const posts = liveAnnouncementsLoaded ? liveAnnouncements.concat(legacyPosts) : legacyPosts;
   if (!posts.length) {
     const empty = document.createElement("p");
     empty.className = "announcement-empty";
