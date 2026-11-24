@@ -42,6 +42,7 @@
     <p class="hint">Přidej fotografii z ImageKitu a krátký komentář. Příspěvky se po zveřejnění zobrazí hráčům na stránce hry. Můžeš přidat i zprávu bez fotografie.</p>
     <div id="posts"></div>
     <button class="small-btn" id="add-post" type="button">+ Přidat zprávu</button>
+    <p class="hint">Nejnovější zpráva je vždy nahoře. Již uložené zprávy můžeš upravit nebo odebrat.</p>
   </div>
   <div class="admin-card">
     <h2>Publikování mise</h2>
@@ -57,6 +58,7 @@ let clueData = [
  {title:"Druhá stopa",text:"Rozhlédni se po centru. Možná tě napoví výloha nebo vánoční výzdoba."}
 ];
 let postData = [];
+let missionLoaded = false;
 function renderClues(){
  $("clues").innerHTML="";
  clueData.forEach((c,i)=>{
@@ -74,7 +76,7 @@ function renderPosts(){
  const wrap=$("posts");wrap.innerHTML="";
  postData.forEach((post,i)=>{
   const row=document.createElement("div");row.className="post-row";
-  row.innerHTML=`<b>Zpráva ${i+1}</b><input type="url" placeholder="Odkaz na fotografii z ImageKitu (volitelné)" aria-label="Odkaz na fotografii" value="${escapeHtml(post.imageUrl||"")}" data-image="${i}"><textarea placeholder="Komentář ke zprávě…" aria-label="Komentář ke zprávě" data-message="${i}">${escapeHtml(post.message||"")}</textarea><button class="small-btn" type="button" data-remove-post="${i}">Odebrat zprávu</button>`;
+  row.innerHTML=`<b>Zpráva ${i+1} – ${i===0?"nejnovější":"starší"}</b><input type="url" placeholder="Odkaz na fotografii z ImageKitu (volitelné)" aria-label="Odkaz na fotografii" value="${escapeHtml(post.imageUrl||"")}" data-image="${i}"><textarea placeholder="Komentář ke zprávě…" aria-label="Komentář ke zprávě" data-message="${i}">${escapeHtml(post.message||"")}</textarea><button class="small-btn" type="button" data-remove-post="${i}">Odebrat zprávu</button>`;
   wrap.appendChild(row);
  });
  wrap.querySelectorAll("[data-image]").forEach(el=>el.addEventListener("input",e=>postData[+e.target.dataset.image].imageUrl=e.target.value.trim()));
@@ -82,6 +84,19 @@ function renderPosts(){
  wrap.querySelectorAll("[data-remove-post]").forEach(el=>el.addEventListener("click",e=>{postData.splice(+e.target.dataset.removePost,1);renderPosts()}));
 }
 $("add-post").addEventListener("click",()=>{postData.unshift({imageUrl:"",message:""});renderPosts()});
+function loadMission(data){
+ if(!data || typeof data!=="object") return;
+ $("active").checked=data.active!==false; $("title").value=data.title||""; $("city").value=data.city||"";
+ $("lat").value=data.centerLat??""; $("lng").value=data.centerLng??""; $("radius").value=data.radiusKm??2.5;
+ $("publicClue").value=data.publicClue||""; $("task").value=data.task||""; $("reward").value=data.rewardText||"";
+ if(Array.isArray(data.clues)) clueData=data.clues.map(c=>({title:c.title||"",text:c.text||""}));
+ if(Array.isArray(data.announcements)) postData=data.announcements.map(p=>({imageUrl:p.imageUrl||"",message:p.message||""}));
+ renderClues(); renderPosts(); missionLoaded=true;
+}
+async function loadSavedMission(){
+ try { const response=await fetch("missions.json?adminLoad="+Date.now(),{cache:"no-store"}); if(response.ok) loadMission(await response.json()); }
+ catch(error){ $("feedback").textContent="Nepodařilo se načíst uloženou misi. Můžeš pokračovat s výchozími údaji."; }
+}
 function makeData(){return {
  active:$("active").checked,title:$("title").value.trim(),city:$("city").value.trim(),
  centerLat:Number($("lat").value),centerLng:Number($("lng").value),radiusKm:Number($("radius").value),
@@ -95,5 +110,6 @@ $("download").addEventListener("click",()=>{
 $("preview").addEventListener("click",()=>window.open("index.html","_blank"));
 renderClues();
 renderPosts();
+loadSavedMission();
 </script>
 </body></html>
