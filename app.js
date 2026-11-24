@@ -1,3 +1,4 @@
+const MESSAGES_API_URL = "https://script.google.com/macros/s/AKfycbys7uP-yDkuPY0k_aGFawtPYuYU1uyb5UimvQs1JxU8Bgk-N7B-u472mU-VF4v2GEhRAQ/exec";
 const DEFAULT_MISSION = {
   active: true,
   title: "Najdi dnešní kavárnu",
@@ -17,6 +18,8 @@ const DEFAULT_MISSION = {
 let mission = null;
 let mapInstance = null;
 let currentClue = 0;
+let liveAnnouncements = [];
+let liveAnnouncementsLoaded = false;
 
 async function loadMission() {
   try {
@@ -57,7 +60,7 @@ function renderAnnouncements() {
   const list = document.getElementById("announcement-list");
   if (!list) return;
   list.innerHTML = "";
-  const posts = Array.isArray(mission?.announcements) ? mission.announcements : [];
+  const posts = liveAnnouncementsLoaded ? liveAnnouncements : (Array.isArray(mission?.announcements) ? mission.announcements : []);
   if (!posts.length) {
     const empty = document.createElement("p");
     empty.className = "announcement-empty";
@@ -71,7 +74,7 @@ function renderAnnouncements() {
     if (post.imageUrl) {
       try {
         const url = new URL(post.imageUrl);
-        if (url.protocol === "https:" && url.hostname === "ik.imagekit.io") {
+        if (url.protocol === "https:" && (url.hostname === "ik.imagekit.io" || url.hostname === "drive.google.com")) {
           const img = document.createElement("img");
           img.src = url.href;
           img.alt = "Fotografie ke zprávě od Daniela";
@@ -80,13 +83,26 @@ function renderAnnouncements() {
         }
       } catch (_) {}
     }
-    if (post.message) {
+    if (post.message || post.text) {
       const text = document.createElement("p");
-      text.textContent = post.message;
+      text.textContent = post.message || post.text;
       card.appendChild(text);
     }
     list.appendChild(card);
   });
+}
+
+
+function loadLiveAnnouncements() {
+  const callbackName = "__najdiMessages_" + Math.random().toString(36).slice(2);
+  const script = document.createElement("script");
+  let done = false;
+  const cleanup = () => { if (done) return; done = true; try { delete window[callbackName]; } catch (_) { window[callbackName] = undefined; } script.remove(); };
+  window[callbackName] = data => { if (data && data.success && Array.isArray(data.messages)) { liveAnnouncements = data.messages; liveAnnouncementsLoaded = true; renderAnnouncements(); } cleanup(); };
+  script.onerror = cleanup;
+  script.src = MESSAGES_API_URL + "?callback=" + callbackName + "&t=" + Date.now();
+  document.head.appendChild(script);
+  setTimeout(cleanup, 12000);
 }
 
 function renderClues() {
@@ -133,6 +149,8 @@ document.getElementById("next-clue").addEventListener("click", () => {
 document.getElementById("task-check").addEventListener("change", renderClues);
 
 loadMission();
+loadLiveAnnouncements();
+setInterval(loadLiveAnnouncements, 30000);
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
 }
