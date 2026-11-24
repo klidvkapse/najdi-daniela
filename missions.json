@@ -1,4 +1,3 @@
-
 {
   "active": true,
   "title": "Ukázková mise – Najdi dnešní kavárnu",
@@ -22,7 +21,7 @@
   "announcements": [
     {
       "imageUrl": "https://ik.imagekit.io/0elwm8vsx/%C4%8Db.png",
-      "message": "ZKOUŠKA"
+      "message": "„Test úpravy zprávy“."
     }
   ]
 }
