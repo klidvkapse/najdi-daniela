@@ -35,6 +35,7 @@ function renderMission() {
   const empty = document.getElementById("no-mission");
   const content = document.getElementById("mission-content");
   if (!mission || !mission.active) {
+    renderAnnouncements();
     empty.classList.remove("hidden");
     content.classList.add("hidden");
     status.textContent = "Momentálně není aktivní žádná mise.";
@@ -49,6 +50,43 @@ function renderMission() {
   status.textContent = mission.subtitle || "Bez registrace. Jen pár indicií a příjemné setkání.";
   renderClues();
   renderMap();
+  renderAnnouncements();
+}
+
+function renderAnnouncements() {
+  const list = document.getElementById("announcement-list");
+  if (!list) return;
+  list.innerHTML = "";
+  const posts = Array.isArray(mission?.announcements) ? mission.announcements : [];
+  if (!posts.length) {
+    const empty = document.createElement("p");
+    empty.className = "announcement-empty";
+    empty.textContent = "Zatím tu nejsou žádné nové zprávy.";
+    list.appendChild(empty);
+    return;
+  }
+  posts.forEach(post => {
+    const card = document.createElement("article");
+    card.className = "announcement-card";
+    if (post.imageUrl) {
+      try {
+        const url = new URL(post.imageUrl);
+        if (url.protocol === "https:" && url.hostname === "ik.imagekit.io") {
+          const img = document.createElement("img");
+          img.src = url.href;
+          img.alt = "Fotografie ke zprávě od Daniela";
+          img.loading = "lazy";
+          card.appendChild(img);
+        }
+      } catch (_) {}
+    }
+    if (post.message) {
+      const text = document.createElement("p");
+      text.textContent = post.message;
+      card.appendChild(text);
+    }
+    list.appendChild(card);
+  });
 }
 
 function renderClues() {
