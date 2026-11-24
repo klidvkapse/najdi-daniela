@@ -151,7 +151,7 @@ document.getElementById("task-check").addEventListener("change", renderClues);
 
 loadMission();
 loadLiveAnnouncements();
-setInterval(loadLiveAnnouncements, 30000);
+setInterval(loadLiveAnnouncements, 5000);
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
 }
