@@ -1,6 +1,6 @@
 {
   "active": true,
-  "title": "Najdi dnešní kavárnu",
+  "title": "Ukázková mise – Najdi dnešní kavárnu",
   "city": "Šumperk a okolí",
   "centerLat": 49.9653,
   "centerLng": 16.9706,
@@ -18,10 +18,5 @@
   ],
   "task": "Najdi na cestě něco, co ti připomene Vánoce.",
   "rewardText": "Odměna 400 Kč je určena pouze účastníkům, kteří splní předem stanovené podmínky příslušné nabídky. Ostatní návštěvníci dostanou drobný reklamní dárek.",
-  "announcements": [
-    {
-      "imageUrl": "https://ik.imagekit.io/0elwm8vsx/%C4%8Db.png",
-      "message": "ZKOUŠKA"
-    }
-  ]
+  "announcements": []
 }
